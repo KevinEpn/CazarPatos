@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.provider.ContactsContract.CommonDataKinds.Email
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -12,10 +13,12 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class LoginActivity : AppCompatActivity() {
+    lateinit var manejadorArchivo: FileHandler
     lateinit var editTextEmail: EditText
     lateinit var editTextPassword: EditText
     lateinit var buttonLogin: Button
     lateinit var buttonNewUser: Button
+    lateinit var checkBoxRecordarme: CheckBox
     lateinit var mediaPlayer: MediaPlayer
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,10 +31,17 @@ class LoginActivity : AppCompatActivity() {
             insets
         }*/
         // Inicialización de variables
+        // manejadorArchivo = SharedPreferencesManager(this)
+        //manejadorArchivo = EncryptedSharedPreferenceManager(this)
+        //manejadorArchivo = FileInternalManager(this)
+        manejadorArchivo = FileExternalManager(this)
         editTextEmail = findViewById(R.id.editTextEmail)
         editTextPassword = findViewById(R.id.editTextPassword)
         buttonLogin = findViewById(R.id.buttonLogin)
         buttonNewUser = findViewById(R.id.buttonNewUser)
+        checkBoxRecordarme = findViewById(R.id.checkboxRecordarme)
+
+        LeerDatosDePreferencias()
 
         // Eventos clic
         buttonLogin.setOnClickListener {
@@ -40,6 +50,8 @@ class LoginActivity : AppCompatActivity() {
             // Validaciones de datos y formatos
             if (!validateRequiredData())
                 return@setOnClickListener
+            //Guardar datos en preferencias.
+            GuardarDatosEnPreferencias()
             //Sí pasa validación de ddatos requeridos, ir a pantalla pricipal
 
             val intent = Intent(this, MainActivity::class.java)
@@ -76,6 +88,30 @@ class LoginActivity : AppCompatActivity() {
         }
         return true
     }
+
+    private fun LeerDatosDePreferencias(){
+        val listadoLeido = manejadorArchivo.ReadInformation()
+        if(listadoLeido.first != null){
+            checkBoxRecordarme.isChecked = true
+        }
+        editTextEmail.setText ( listadoLeido.first )
+        editTextPassword.setText ( listadoLeido.second )
+    }
+
+    private fun GuardarDatosEnPreferencias(){
+        val email = editTextEmail.text.toString()
+        val clave = editTextPassword.text.toString()
+        val listadoAGrabar:Pair<String,String>
+        if(checkBoxRecordarme.isChecked){
+            listadoAGrabar = email to clave
+        }
+        else{
+            listadoAGrabar ="" to ""
+        }
+        manejadorArchivo.SaveInformation(listadoAGrabar)
+    }
+
+
 
     override fun onDestroy() {
         mediaPlayer.release()
