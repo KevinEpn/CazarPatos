@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "229496985785",
+    "project_id": "projcazarpatos2025a-83c24",
+    "storage_bucket": "projcazarpatos2025a-83c24.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:229496985785:android:791ec97c0ae3180e94a368",
+        "android_client_info": {
+          "package_name": "com.kevin.asimbaya.cazarpatos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC9Z9VQ5aS-qpbB66U4wNHzug7-Ee1gtIU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,13 +4,18 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.provider.ContactsContract.CommonDataKinds.Email
+import android.util.Log
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class LoginActivity : AppCompatActivity() {
     lateinit var manejadorArchivo: FileHandler
@@ -20,6 +25,7 @@ class LoginActivity : AppCompatActivity() {
     lateinit var buttonNewUser: Button
     lateinit var checkBoxRecordarme: CheckBox
     lateinit var mediaPlayer: MediaPlayer
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +47,8 @@ class LoginActivity : AppCompatActivity() {
         buttonNewUser = findViewById(R.id.buttonNewUser)
         checkBoxRecordarme = findViewById(R.id.checkboxRecordarme)
 
+        auth = Firebase.auth
+
         LeerDatosDePreferencias()
 
         // Eventos clic
@@ -54,10 +62,11 @@ class LoginActivity : AppCompatActivity() {
             GuardarDatosEnPreferencias()
             //Sí pasa validación de ddatos requeridos, ir a pantalla pricipal
 
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra(EXTRA_LOGIN, email)
-            startActivity(intent)
-            finish()
+//            val intent = Intent(this, MainActivity::class.java)
+//            intent.putExtra(EXTRA_LOGIN, email)
+//            startActivity(intent)
+//            finish()
+            AutenticarUsuario(email, clave)
         }
 
         buttonNewUser.setOnClickListener{
@@ -111,7 +120,22 @@ class LoginActivity : AppCompatActivity() {
         manejadorArchivo.SaveInformation(listadoAGrabar)
     }
 
-
+    fun AutenticarUsuario(email:String, password:String) {
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    Log.d(EXTRA_LOGIN, "singInWithEmail:success")
+                    // Si pasa validacion de datos requeridos, ir a pantalla pricipal
+                    val intencion = Intent(this, MainActivity::class.java)
+                    intencion.putExtra(EXTRA_LOGIN, auth.currentUser!!.email)
+                    startActivity(intencion)
+                } else {
+                    Log.w(EXTRA_LOGIN, "singInWithEmail:failure", task.exception)
+                    Toast.makeText(baseContext, task.exception!!.message,
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
 
     override fun onDestroy() {
         mediaPlayer.release()
